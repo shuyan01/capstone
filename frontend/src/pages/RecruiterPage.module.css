@@ -1,0 +1,70 @@
+.page { min-height:100vh; background:#FCF8F1; padding:24px 28px 36px; }
+.topBar { display:flex; align-items:flex-start; gap:16px; margin-bottom:22px; }
+
+.title { font-size:30px; line-height:1.1; color:#3D2B1F; font-family:var(--font-serif); }
+.subtitle { margin-top:6px; font-size:13px; color:#8B7355; }
+.errorBox { background:#FFEBEE; border:0.5px solid #FFCDD2; color:#9B3D2E; border-radius:12px; padding:14px 16px; margin-bottom:16px; }
+
+/* Metrics hero row */
+.hero { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:14px; margin-bottom:16px; }
+.metricCard { background:linear-gradient(145deg, #3D2B1F, #6B5740); border-radius:16px; padding:18px; color:#F8F1E6; display:flex; flex-direction:column; gap:6px; min-height:108px; justify-content:flex-end; }
+.metricValue { font-size:34px; line-height:1; font-family:var(--font-serif); }
+.metricLabel { font-size:12px; text-transform:uppercase; letter-spacing:0.05em; opacity:0.78; }
+
+/* Grid */
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.card { background:#FDFAF5; border:0.5px solid #D6CCBB; border-radius:16px; padding:18px; min-height:200px; }
+.wide { grid-column:1 / -1; }
+.cardTitle { font-size:12px; font-weight:600; color:#8B7355; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px; }
+.list { display:flex; flex-direction:column; gap:4px; }
+.row { display:flex; justify-content:space-between; gap:12px; font-size:13px; color:#3D2B1F; padding:8px 0; border-bottom:0.5px solid #EFE4D0; }
+.empty { font-size:13px; color:#8B7355; padding-top:12px; line-height:1.6; }
+
+/* Pipeline header with search */
+.pipelineHeader { display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.pipelineSearch { flex:1; min-width:180px; max-width:260px; font-size:12px; padding:6px 10px; border:0.5px solid #D6CCBB; border-radius:20px; background:#FAF6F0; color:#3D2B1F; outline:none; }
+.pipelineSearch:focus { border-color:#8B7355; }
+.pipelineCount { font-size:12px; color:#8B7355; margin-left:auto; }
+
+/* Pipeline list */
+.pipelineList { display:flex; flex-direction:column; gap:6px; }
+.pipelineCandidate { background:#F5F0E8; border-radius:10px; padding:10px 14px; }
+.pipelineCandidateHeader { display:flex; align-items:center; justify-content:space-between; cursor:pointer; user-select:none; }
+.pipelineCandidateId { font-size:13px; font-weight:700; color:#3D2B1F; }
+.pipelineCandidateMeta { display:flex; gap:6px; align-items:center; }
+.pipelineTag { font-size:11px; padding:2px 8px; border-radius:8px; background:#EDE9F7; color:#7C6FCD; font-weight:600; }
+.pipelineTagHandoff { background:#FEF6E8; color:#E09B3D; }
+.chevron { font-size:10px; color:#8B7355; margin-left:4px; }
+
+/* Timeline */
+.pipelineTimeline { display:flex; flex-direction:column; gap:10px; border-left:2px solid #D6CCBB; margin:10px 0 2px 6px; padding-left:14px; }
+.pipelineEvent { display:flex; align-items:flex-start; gap:10px; }
+.pipelineEventDot { width:10px; height:10px; border-radius:50%; margin-top:3px; flex-shrink:0; margin-left:-20px; border:2px solid #F5F0E8; }
+.pipelineEventBody { flex:1; }
+.pipelineEventTitle { font-size:13px; font-weight:600; color:#3D2B1F; }
+.pipelineEventMeta { font-size:11px; color:#8B7355; margin-top:2px; }
+.pipelineEventNote { font-size:12px; color:#3D2B1F; margin-top:4px; font-style:italic; }
+.pipelineEventQuery { font-size:11px; color:#A0906A; margin-top:3px; }
+.link { color:#7C6FCD; text-decoration:underline; }
+
+/* Badges */
+.badge { font-size:10px; padding:2px 7px; border-radius:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; flex-shrink:0; }
+.badge_scheduled { background:#E8F5EF; color:#4CAF82; }
+.badge_completed { background:#EDE9F7; color:#7C6FCD; }
+.badge_cancelled { background:#FFEBEE; color:#E07B6A; }
+
+/* Pagination */
+.pager { display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px; }
+.pagerBtn { font-size:12px; color:#6B5740; background:#FDFAF5; border:0.5px solid #D6CCBB; border-radius:16px; padding:5px 14px; cursor:pointer; }
+.pagerBtn:disabled { opacity:0.35; cursor:default; }
+.pagerInfo { font-size:12px; color:#8B7355; }
+
+@media (max-width: 1024px) {
+  .hero { grid-template-columns:1fr 1fr; }
+  .grid { grid-template-columns:1fr; }
+}
+@media (max-width: 720px) {
+  .page { padding:18px 16px 28px; }
+  .topBar { flex-direction:column; }
+  .hero { grid-template-columns:1fr 1fr; }
+}

@@ -1,0 +1,48 @@
+# ─────────────────────────────────────────
+# AI Resume Matching System — Requirements
+# Python 3.11.x
+# ─────────────────────────────────────────
+
+# ── Core LLM & Embeddings ──────────────────
+openai>=1.30.0
+
+# ── LangChain ecosystem ────────────────────
+langchain>=0.2.0
+langchain-openai>=0.1.0
+langchain-community>=0.2.0
+langchain-chroma>=0.1.0
+langgraph>=0.1.0
+
+# ── Vector Store ───────────────────────────
+chromadb>=0.5.0
+
+# ── Keyword Search (BM25) ──────────────────
+rank-bm25>=0.2.2
+
+# ── PDF Parsing ────────────────────────────
+pymupdf>=1.24.0
+
+# ── Data Handling ──────────────────────────
+pandas>=2.2.0
+numpy>=1.26.0
+
+# ── API Framework ──────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.7.0
+python-multipart>=0.0.9
+
+# ── Environment & Config ───────────────────
+python-dotenv>=1.0.0
+
+# ── Evaluation (Requirement 2) ─────────────
+deepeval>=0.21.0
+
+# ── Optional reranking backend ─────────────
+# Install when enabling Hugging Face cross-encoder reranking locally.
+sentence-transformers>=3.0.0
+torch>=2.3.0
+
+# ── Utilities ──────────────────────────────
+tqdm>=4.66.0
+tenacity>=8.3.0

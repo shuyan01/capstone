@@ -1,0 +1,128 @@
+{
+  "profiles": {
+    "technical": {
+      "keywords": [
+        "backend",
+        "frontend",
+        "full stack",
+        "developer",
+        "engineer",
+        "microservice",
+        "cloud",
+        "api",
+        "fastapi",
+        "react",
+        "java",
+        "spring",
+        "python",
+        "devops",
+        "aws",
+        "kubernetes",
+        "docker",
+        "ci/cd",
+        "pipeline",
+        "pipelines",
+        "machine learning",
+        "ml",
+        "mlops",
+        "tensorflow",
+        "pytorch",
+        "model deployment"
+      ],
+      "minimums": {
+        "skill": 0.4,
+        "experience": 0.2,
+        "technical": 0.35,
+        "culture": 0.15
+      },
+      "hard_dimensions": [
+        "skill",
+        "technical"
+      ]
+    },
+    "analytics": {
+      "keywords": [
+        "analyst",
+        "analytics",
+        "data",
+        "sql",
+        "reporting",
+        "dashboard",
+        "power bi",
+        "tableau",
+        "excel",
+        "business intelligence"
+      ],
+      "minimums": {
+        "skill": 0.35,
+        "experience": 0.2,
+        "technical": 0.25,
+        "culture": 0.15
+      },
+      "hard_dimensions": [
+        "skill"
+      ]
+    },
+    "management": {
+      "keywords": [
+        "manager",
+        "lead",
+        "director",
+        "stakeholder",
+        "delivery",
+        "people management",
+        "program",
+        "project",
+        "consultant"
+      ],
+      "minimums": {
+        "skill": 0.3,
+        "experience": 0.35,
+        "technical": 0.1,
+        "culture": 0.3
+      },
+      "hard_dimensions": [
+        "experience",
+        "culture"
+      ]
+    },
+    "business_development": {
+      "keywords": [
+        "business development",
+        "partnership",
+        "partnerships",
+        "b2b",
+        "saas",
+        "enterprise",
+        "client acquisition",
+        "market expansion",
+        "startup growth",
+        "international",
+        "strategic partnerships",
+        "growth"
+      ],
+      "minimums": {
+        "skill": 0.35,
+        "experience": 0.3,
+        "technical": 0.05,
+        "culture": 0.25
+      },
+      "hard_dimensions": [
+        "skill",
+        "experience"
+      ]
+    },
+    "general": {
+      "keywords": [],
+      "minimums": {
+        "skill": 0.35,
+        "experience": 0.2,
+        "technical": 0.2,
+        "culture": 0.15
+      },
+      "hard_dimensions": [
+        "skill"
+      ]
+    }
+  }
+}

@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1480" height="1020" viewBox="0 0 1480 1020">
+  <style>
+    .bg { fill: #f7f3ea; }
+    .title { font: 700 30px Georgia, serif; fill: #2f2419; }
+    .subtitle { font: 400 15px Arial, sans-serif; fill: #6d5a46; }
+    .lane { fill: #fbf8f2; stroke: #dbcdb9; stroke-width: 2; rx: 22; }
+    .box { fill: #fffdf8; stroke: #c8b79d; stroke-width: 2; rx: 18; }
+    .accent { fill: #f1e6d4; stroke: #9a6a30; stroke-width: 2; rx: 18; }
+    .api { fill: #ede6f7; stroke: #6555a1; stroke-width: 2; rx: 18; }
+    .analytics { fill: #e7f2ea; stroke: #4d8a60; stroke-width: 2; rx: 18; }
+    .text { font: 700 18px Arial, sans-serif; fill: #22180f; }
+    .small { font: 400 13px Arial, sans-serif; fill: #4b3d30; }
+    .tiny { font: 400 12px Arial, sans-serif; fill: #6d5a46; }
+    .arrow { stroke: #7a6752; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+    .dashed { stroke-dasharray: 8 7; }
+  </style>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#7a6752"/>
+    </marker>
+  </defs>
+
+  <rect width="1480" height="1020" class="bg"/>
+
+  <text x="52" y="54" class="title">AI Resume Intelligence and Candidate Matching System</text>
+  <text x="52" y="82" class="subtitle">Current architecture: hybrid metadata extraction, hybrid retrieval, cross-encoder reranking, multi-agent scoring, post-agent gating, API delivery, and recruiter analytics.</text>
+
+  <rect x="38" y="116" width="1404" height="250" class="lane"/>
+  <text x="60" y="146" class="text">1. Ingestion And Indexing</text>
+
+  <rect x="58" y="176" width="210" height="128" class="box"/>
+  <text x="80" y="208" class="text">Resume Sources</text>
+  <text x="80" y="234" class="small">CSV dataset</text>
+  <text x="80" y="254" class="small">PDF resumes</text>
+  <text x="80" y="274" class="small">Category labels</text>
+
+  <rect x="310" y="176" width="240" height="128" class="box"/>
+  <text x="332" y="208" class="text">Parsing And Cleaning</text>
+  <text x="332" y="234" class="small">Text normalization</text>
+  <text x="332" y="254" class="small">Resume validation</text>
+  <text x="332" y="274" class="small">Unified resume schema</text>
+
+  <rect x="592" y="156" width="316" height="168" class="accent"/>
+  <text x="614" y="188" class="text">Structured Metadata Extraction</text>
+  <text x="614" y="214" class="small">Heuristic metadata baseline</text>
+  <text x="614" y="234" class="small">Optional LLM enrichment</text>
+  <text x="614" y="254" class="small">Local metadata cache</text>
+  <text x="614" y="274" class="small">Outputs:</text>
+  <text x="638" y="294" class="tiny">education_level, degree_subjects</text>
+  <text x="638" y="312" class="tiny">job_titles, location_tags, industry_tags</text>
+
+  <rect x="950" y="176" width="228" height="128" class="box"/>
+  <text x="972" y="208" class="text">Chunking</text>
+  <text x="972" y="234" class="small">Section-aware chunking</text>
+  <text x="972" y="254" class="small">Chunk metadata attached</text>
+  <text x="972" y="274" class="small">Fallback recursive splitting</text>
+
+  <rect x="1210" y="156" width="210" height="168" class="box"/>
+  <text x="1232" y="188" class="text">Indexes</text>
+  <text x="1232" y="214" class="small">Chroma vector store</text>
+  <text x="1232" y="234" class="small">BM25 keyword index</text>
+  <text x="1232" y="254" class="small">Chunk metadata persisted</text>
+  <text x="1232" y="274" class="small">Incremental or full rebuild</text>
+
+  <path d="M268 240 L310 240" class="arrow"/>
+  <path d="M550 240 L592 240" class="arrow"/>
+  <path d="M908 240 L950 240" class="arrow"/>
+  <path d="M1178 240 L1210 240" class="arrow"/>
+
+  <rect x="38" y="396" width="1404" height="286" class="lane"/>
+  <text x="60" y="426" class="text">2. Retrieval, Reranking, And Evaluation</text>
+
+  <rect x="58" y="454" width="248" height="160" class="api"/>
+  <text x="80" y="486" class="text">Recruiter Request</text>
+  <text x="80" y="512" class="small">Natural-language job description</text>
+  <text x="80" y="532" class="small">Advanced filters:</text>
+  <text x="104" y="552" class="tiny">category, required skills, years</text>
+  <text x="104" y="570" class="tiny">education, industry, location</text>
+
+  <rect x="350" y="434" width="326" height="200" class="accent"/>
+  <text x="372" y="466" class="text">Hybrid Candidate Retrieval</text>
+  <text x="372" y="492" class="small">LLM query expansion</text>
+  <text x="372" y="512" class="small">LLM category inference</text>
+  <text x="372" y="532" class="small">Semantic search over Chroma</text>
+  <text x="372" y="552" class="small">BM25 keyword search</text>
+  <text x="372" y="572" class="small">RRF merge + cross-source dedup</text>
+  <text x="372" y="592" class="small">Offline fallback: BM25-only mode</text>
+
+  <rect x="714" y="454" width="234" height="160" class="box"/>
+  <text x="736" y="486" class="text">Reranking</text>
+  <text x="736" y="512" class="small">Cross-encoder reranker</text>
+  <text x="736" y="532" class="small">Heuristic fallback reranker</text>
+  <text x="736" y="552" class="small">Resume-level context restored</text>
+  <text x="736" y="572" class="small">Advanced recruiter filters</text>
+
+  <rect x="986" y="434" width="416" height="200" class="box"/>
+  <text x="1008" y="466" class="text">Multi-Agent Evaluation Pipeline</text>
+  <text x="1008" y="492" class="small">1. Skill Matching Agent</text>
+  <text x="1008" y="512" class="small">2. Experience Evaluation Agent</text>
+  <text x="1008" y="532" class="small">3. Technical Evaluation Agent</text>
+  <text x="1008" y="552" class="small">4. Culture Fit Agent</text>
+  <text x="1008" y="578" class="small">Shared query context and token optimization</text>
+  <text x="1008" y="598" class="small">Alias-aware skill normalization for role families</text>
+
+  <path d="M306 534 L350 534" class="arrow"/>
+  <path d="M676 534 L714 534" class="arrow"/>
+  <path d="M948 534 L986 534" class="arrow"/>
+  <path d="M1315 324 L1315 396 L532 396 L532 434" class="arrow"/>
+
+  <rect x="38" y="714" width="1404" height="264" class="lane"/>
+  <text x="60" y="744" class="text">3. Scoring, Delivery, And Feedback Loop</text>
+
+  <rect x="58" y="776" width="320" height="150" class="accent"/>
+  <text x="80" y="808" class="text">Scoring And Gating</text>
+  <text x="80" y="834" class="small">Weighted score aggregation</text>
+  <text x="80" y="854" class="small">Query-aware screening profiles</text>
+  <text x="80" y="874" class="small">Post-agent gating penalties</text>
+  <text x="80" y="894" class="small">Explainable candidate summaries</text>
+
+  <rect x="420" y="776" width="344" height="150" class="api"/>
+  <text x="442" y="808" class="text">API And Recruiter UI</text>
+  <text x="442" y="834" class="small">FastAPI endpoints: /match, /resume, /categories, /health</text>
+  <text x="442" y="854" class="small">React recruiter search UI</text>
+  <text x="442" y="874" class="small">Candidate detail view</text>
+  <text x="442" y="894" class="small">Independent analytics dashboard at /analytics</text>
+
+  <rect x="806" y="756" width="294" height="170" class="analytics"/>
+  <text x="828" y="788" class="text">Recruiter Feedback Loop</text>
+  <text x="828" y="814" class="small">Helpful / not helpful feedback</text>
+  <text x="828" y="834" class="small">SQLite analytics store</text>
+  <text x="828" y="854" class="small">Interview scheduling records</text>
+  <text x="828" y="874" class="small">Recruiter to hiring-manager handoff notes</text>
+  <text x="828" y="894" class="small">Trend and usage analytics</text>
+
+  <rect x="1142" y="776" width="260" height="150" class="box"/>
+  <text x="1164" y="808" class="text">Evaluation And Ops</text>
+  <text x="1164" y="834" class="small">DeepEval test suite</text>
+  <text x="1164" y="854" class="small">Benchmark runner</text>
+  <text x="1164" y="874" class="small">Retrieval fallback support</text>
+  <text x="1164" y="894" class="small">Config-driven gating thresholds</text>
+
+  <path d="M1194 634 L1194 714 L218 714 L218 776" class="arrow"/>
+  <path d="M378 850 L420 850" class="arrow"/>
+  <path d="M764 850 L806 850" class="arrow"/>
+  <path d="M1100 850 L1142 850" class="arrow"/>
+
+  <path d="M954 926 L954 960 L592 960 L592 926" class="arrow dashed"/>
+  <text x="624" y="955" class="tiny">feedback-driven recruiter analytics loop</text>
+</svg>
