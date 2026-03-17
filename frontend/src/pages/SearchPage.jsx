@@ -39,7 +39,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
   const [results, setResults] = useState(null)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null)   // { message, type: 'guardrail'|'system' }
   const [elapsed, setElapsed] = useState(null)
   const stepTimer = useRef([])
   const startTime = useRef(null)
@@ -92,6 +92,7 @@ export default function SearchPage() {
     e.preventDefault()
     if (!jobQuery.trim()) return
     setError(null); setResults(null); setLoading(true)
+
     startAnimation(); startTime.current = Date.now()
     try {
       const data = await matchCandidates({
@@ -110,7 +111,7 @@ export default function SearchPage() {
     sessionStorage.setItem('lastResults', JSON.stringify(data))
     sessionStorage.setItem('lastQuery', jobQuery.trim())
     sessionStorage.setItem('lastElapsed', el)
-    } catch (err) { setError(err.message) }
+    } catch (err) { setError({ message: err.message, type: err.type || 'system' }) }
     finally {
       fetchAnalytics().then(setAnalytics).catch(() => {})
       clearAnimation()
@@ -281,7 +282,18 @@ export default function SearchPage() {
         )}
         {loading && <LoadingSpinner step={loadingStep} />}
         {error && !loading && (
-          <div className={styles.errorBox}><strong>Something went wrong</strong><p>{error}</p></div>
+          error.type === 'guardrail' ? (
+            <div className={styles.guardrailBox}>
+              <div className={styles.guardrailHeader}>
+                <span className={styles.guardrailIcon}>🛡</span>
+                <strong>Query blocked by guardrail</strong>
+              </div>
+              <p className={styles.guardrailMsg}>{error.message}</p>
+              <p className={styles.guardrailHint}>Revise the job description to focus on skills, experience, and responsibilities only.</p>
+            </div>
+          ) : (
+            <div className={styles.errorBox}><strong>Something went wrong</strong><p>{error.message}</p></div>
+          )
         )}
         {results && !loading && (
           <div className={styles.results}>

@@ -26,6 +26,9 @@ Graph structure:
   [enrich_candidates]       -- fetch full resume text from all chunks
       |
       v
+  [summarize_candidates]    -- GPT-4o-mini structured summary (with disk cache)
+      |
+      v
   [evaluate_candidates]     -- runs all 4 specialist agents per candidate
       |
       v
@@ -46,6 +49,7 @@ from langgraph.graph import StateGraph, START, END
 
 from retrieval.hybrid_retriever       import hybrid_search
 from agents.resume_parsing_agent      import run_resume_parsing_agent
+from ingestion.summarizer             import batch_summarize
 from agents.skill_matching_agent      import run_skill_matching_agent
 from agents.experience_agent          import run_experience_agent
 from agents.technical_agent           import run_technical_agent
@@ -71,11 +75,11 @@ TOP_K_FINAL = int(os.getenv("TOP_K_FINAL", "5"))
 
 # Token optimization — cap how much text each agent sees
 # Skills/Experience/Technical agents: need full context
-MAX_RESUME_TEXT_CHARS = 100000
+MAX_RESUME_TEXT_CHARS = int(os.getenv("MAX_RESUME_TEXT_CHARS", "3000"))
 
 # Culture fit agent uses gpt-4o (expensive) — give it less text
 # It only needs to assess soft skills, not technical details
-MAX_CULTURE_TEXT_CHARS = 15000
+MAX_CULTURE_TEXT_CHARS = int(os.getenv("MAX_CULTURE_TEXT_CHARS", "1500"))
 
 
 # -----------------------------------------
@@ -179,7 +183,33 @@ def parse_candidates(state: PipelineState) -> PipelineState:
 
 
 # -----------------------------------------
-# Node 4: Evaluate Candidates
+# Node 4: Summarize Candidates
+# -----------------------------------------
+
+def summarize_candidates(state: PipelineState) -> PipelineState:
+    """
+    Condenses each candidate's full resume text into a structured,
+    information-dense summary via GPT-4o-mini.
+
+    Benefits over naive truncation:
+    - Preserves ALL key signals (skills, roles, certs, projects)
+      regardless of where they appear in the original document.
+    - Structured format (SKILLS / EXPERIENCE / EDUCATION / …)
+      makes downstream agents more reliable.
+    - Persistent disk cache: LLM called only once per unique resume;
+      every subsequent query is served instantly at zero LLM cost.
+    """
+    print(f"\n[Orchestrator] Step 4/6 — Summarizing resumes (GPT-4o-mini + disk cache)...")
+    candidates = state["candidates"]
+    if not candidates:
+        return state
+
+    summarized = batch_summarize(candidates)
+    return {**state, "candidates": summarized}
+
+
+# -----------------------------------------
+# Node 5: Evaluate Candidates
 # -----------------------------------------
 
 def evaluate_candidates(state: PipelineState) -> PipelineState:
@@ -191,7 +221,7 @@ def evaluate_candidates(state: PipelineState) -> PipelineState:
     - Culture fit uses shorter text (MAX_CULTURE_TEXT_CHARS) to reduce gpt-4o cost
     - Required skills extracted ONCE by skill agent, reused across all candidates
     """
-    print(f"\n[Orchestrator] Step 4/5 — Running agent evaluations...")
+    print(f"\n[Orchestrator] Step 5/6 — Running agent evaluations...")
     print(f"  Token budget: {MAX_RESUME_TEXT_CHARS} chars/candidate (technical agents), "
           f"{MAX_CULTURE_TEXT_CHARS} chars/candidate (culture agent)")
 
@@ -235,12 +265,12 @@ def evaluate_candidates(state: PipelineState) -> PipelineState:
 
 
 # -----------------------------------------
-# Node 4: Aggregate Scores
+# Node 6: Aggregate Scores
 # -----------------------------------------
 
 def aggregate_scores(state: PipelineState) -> PipelineState:
     """Combines all four agent scores into a weighted composite score."""
-    print(f"\n[Orchestrator] Step 5/5 — Aggregating scores...")
+    print(f"\n[Orchestrator] Step 6/6 — Aggregating scores...")
 
     final_rankings = aggregate_candidate_scores(
         candidates=state["candidates"],
@@ -301,18 +331,20 @@ def build_graph(chunks: list[dict] | None = None) -> StateGraph:
 
     graph = StateGraph(PipelineState)
 
-    graph.add_node("retrieve_candidates", _retrieve_candidates)
-    graph.add_node("parse_candidates",    parse_candidates)
-    graph.add_node("enrich_candidates",   _enrich_candidates)
-    graph.add_node("evaluate_candidates", evaluate_candidates)
-    graph.add_node("aggregate_scores",    aggregate_scores)
+    graph.add_node("retrieve_candidates",  _retrieve_candidates)
+    graph.add_node("parse_candidates",     parse_candidates)
+    graph.add_node("enrich_candidates",    _enrich_candidates)
+    graph.add_node("summarize_candidates", summarize_candidates)
+    graph.add_node("evaluate_candidates",  evaluate_candidates)
+    graph.add_node("aggregate_scores",     aggregate_scores)
 
-    graph.add_edge(START,                  "retrieve_candidates")
-    graph.add_edge("retrieve_candidates",  "parse_candidates")
-    graph.add_edge("parse_candidates",     "enrich_candidates")
-    graph.add_edge("enrich_candidates",    "evaluate_candidates")
-    graph.add_edge("evaluate_candidates",  "aggregate_scores")
-    graph.add_edge("aggregate_scores",     END)
+    graph.add_edge(START,                   "retrieve_candidates")
+    graph.add_edge("retrieve_candidates",   "parse_candidates")
+    graph.add_edge("parse_candidates",      "enrich_candidates")
+    graph.add_edge("enrich_candidates",     "summarize_candidates")
+    graph.add_edge("summarize_candidates",  "evaluate_candidates")
+    graph.add_edge("evaluate_candidates",   "aggregate_scores")
+    graph.add_edge("aggregate_scores",      END)
 
     return graph.compile()
 

@@ -41,8 +41,11 @@ export async function matchCandidates({
       : Array.isArray(detail)
         ? detail.map(d => d.msg || JSON.stringify(d)).join(', ')
         : JSON.stringify(detail)
-    throw new Error(msg || 'Match request failed')
-}  return data
+    const err = new Error(msg || 'Match request failed')
+    err.type = res.status === 400 ? 'guardrail' : 'system'
+    throw err
+  }
+  return data
 }
 
 export async function checkHealth() {

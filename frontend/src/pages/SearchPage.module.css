@@ -50,6 +50,13 @@
 .exampleBtn:hover { background:#EDE5D8; }
 .errorBox { background:#FFEBEE; border:0.5px solid #FFCDD2; border-radius:12px; padding:14px 16px; color:#9B3D2E; font-size:13px; line-height:1.6; }
 .errorBox strong { display:block; font-weight:500; margin-bottom:4px; }
+
+.guardrailBox { background:#FFF8E1; border:1px solid #FFE082; border-radius:12px; padding:16px 18px; color:#5D4037; font-size:13px; line-height:1.6; }
+.guardrailHeader { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.guardrailIcon { font-size:16px; line-height:1; }
+.guardrailHeader strong { font-size:13.5px; font-weight:600; color:#4E342E; }
+.guardrailMsg { margin:0 0 8px 0; color:#5D4037; }
+.guardrailHint { margin:0; font-size:12px; color:#8D6E63; font-style:italic; }
 .results { display:flex; flex-direction:column; gap:12px; }
 .resultsHeader { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:4px; }
 .resultsTitle { font-size:20px; font-weight:500; font-family:var(--font-serif); color:#3D2B1F; }
