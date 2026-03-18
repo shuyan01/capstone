@@ -35,10 +35,12 @@ subgraph C["C · Hybrid Retrieval (per query)"]
   C1["📊 ChromaDB\nSemantic Search\nweight = 0.6"]
   C2["📊 BM25\nKeyword Search\nweight = 0.4"]
   C3["🔀 RRF Fusion\nReciprocal Rank Fusion\nk = 60\nDeduplicate by resume_id"]
+  C4["📐 Cross-Encoder Reranking\nms-marco-MiniLM-L-6-v2\nReranks RRF results\nFallback: heuristic scorer"]
   C0 --> C1
   C0 --> C2
   C1 --> C3
   C2 --> C3
+  C3 --> C4
 end
 
 %% ============================================================

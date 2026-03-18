@@ -4,15 +4,20 @@ This project matches recruiter-written job descriptions to resumes using hybrid 
 
 ## Features
 
-- Hybrid candidate retrieval with ChromaDB semantic search and BM25 keyword search
-- Optional cross-encoder reranking with heuristic fallback when model dependencies are unavailable
-- Multi-agent evaluation for skills, experience, technical depth, and culture fit
+- Hybrid candidate retrieval with ChromaDB semantic search and BM25 keyword search, fused via Reciprocal Rank Fusion (RRF), then cross-encoder reranking (`ms-marco-MiniLM-L-6-v2`)
+- LLM query expansion (gpt-4o-mini) before retrieval for better recall
+- Resume Summarizer: GPT-4o-mini condenses each resume into a structured digest with persistent disk cache (zero cost on repeat queries)
+- Resume Parsing Agent: heuristic section detection and demographic bias flagging with zero LLM cost
+- Multi-agent evaluation pipeline (LangGraph 6 nodes) for skills, experience, technical depth, and culture fit
 - Post-agent gating so one strong dimension does not hide a critical weak dimension
+- Dynamic weight profiles (technical / analytics / management / general) auto-selected from job query
 - Recruiter filters for category, required skills, years of experience, education, industry, and location
 - Recruiter feedback loop with analytics, interview scheduling, and handoff notes
+- Input guardrails: bias language and off-topic queries blocked with HTTP 400 (not a crash)
+- LangSmith tracing: every pipeline node traced with token count and latency
 - FastAPI service with Swagger docs
 - React front end for search and candidate review
-- Evaluation suite with DeepEval metrics and a lightweight benchmark runner
+- Evaluation suite with DeepEval metrics (AnswerRelevancy + GEval LLM-as-Judge) and a lightweight benchmark runner
 
 ## Project Structure
 
@@ -56,9 +61,18 @@ VECTOR_SEARCH_WEIGHT=0.6
 BM25_SEARCH_WEIGHT=0.4
 GATING_CONFIG_PATH=./config/gating_thresholds.json
 FORCE_BM25_ONLY=false
-METADATA_EXTRACTION_MODE=hybrid
-METADATA_MODEL=gpt-4o-mini
-METADATA_CACHE_PATH=./data/processed/metadata_cache.json
+METADATA_EXTRACTION_MODE=heuristic
+
+# Resume Summarizer
+SUMMARIZER_ENABLED=true
+MAX_RESUME_TEXT_CHARS=3000
+MAX_CULTURE_TEXT_CHARS=1500
+SUMMARIZER_WORKERS=4
+
+# LangSmith tracing (optional)
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_API_KEY=your_langsmith_key_here
+LANGCHAIN_PROJECT=ai-resume-matching
 ```
 
 ### 3. Add datasets
@@ -82,10 +96,11 @@ This pipeline:
 
 1. Loads resumes from CSV and PDF
 2. Cleans and validates records
-3. Chunks long resumes by section
-4. Extracts structured metadata with heuristic + cached LLM enrichment
-5. Generates embeddings
-6. Stores vectors in ChromaDB and BM25 index on disk
+3. Chunks long resumes by section (500-char chunks, 50-char overlap, section-aware)
+4. Extracts structured metadata with heuristic mode (zero LLM cost)
+5. Generates embeddings with `text-embedding-3-small` (1536-dim)
+6. Stores vectors in ChromaDB and builds BM25 index on disk
+7. Optionally pre-generate resume summaries: `python ingestion/summarizer.py`
 
 If you enable new metadata extraction settings, re-run ingestion with a fresh index
 so the enriched metadata is written into ChromaDB.
@@ -124,8 +139,10 @@ The dedicated recruiter analytics dashboard is available at `/analytics`.
 ## Example Query
 
 ```text
-We are looking for a Python backend engineer with FastAPI, PostgreSQL, and Docker experience who can collaborate with product and client teams.
+Information Assurance professional with Risk Management Framework (RMF), Active Directory design, and enterprise platform experience. Project management skills required.
 ```
+
+For best results, keep queries focused (2-3 sentences). Longer queries cause the skill agent to extract more required skills, increasing the chance of a gate penalty.
 
 Optional advanced filters supported by `POST /match`:
 
@@ -183,11 +200,12 @@ Trade-offs implemented in the codebase:
 - Chunking strategy: section-aware chunking with recursive fallback for long resumes
 - Retrieval: hybrid semantic + BM25 search to recover both contextual and exact-skill matches
 - Offline retrieval fallback: set `FORCE_BM25_ONLY=true` to skip semantic retrieval and run BM25-only candidate retrieval in restricted environments
-- Reranking: cross-encoder hook is wired into retrieval, but falls back to a deterministic heuristic in environments without local model dependencies
-- Agent orchestration: LangGraph pipeline keeps retrieval, evaluation, and ranking stages modular
+- Reranking: RRF (Reciprocal Rank Fusion, k=60) merges semantic and BM25 ranked lists, then a cross-encoder (`cross-encoder/ms-marco-MiniLM-L-6-v2`) reranks candidates; falls back to heuristic if `sentence-transformers` is unavailable
+- Agent orchestration: LangGraph 6-node pipeline (retrieve → parse → enrich → summarize → evaluate → aggregate) keeps stages modular
 - Post-agent screening: query-aware score thresholds penalize or filter candidates with critically low skill, technical, experience, or culture subscores
 - Bias mitigation: demographic and biased-hiring phrases are blocked at input-validation time
-- Token optimization: shorter culture-fit context and reusable skill extraction reduce LLM cost
+- Token optimization: resume summarizer compresses text before agent evaluation; shorter culture-fit context (MAX_CULTURE_TEXT_CHARS) and reusable skill extraction further reduce cost
+- LLM-as-Judge: DeepEval GEval metric evaluates the quality of generated candidate explanations (enabled with `RUN_LLM_JUDGE=1`)
 
 ## Evaluation
 
@@ -225,7 +243,7 @@ Benchmark summary reports:
 
 ## Deliverables
 
-- Architecture diagram: `docs/architecture_diagram.svg`
+- Architecture diagram: `docs/architecture_diagram.svg` and `docs/architecture_v2.pdf`
 - Full executable microservice: FastAPI backend + React front end
 - Explainable ranking output with per-agent score breakdown
 - Evaluation suite and benchmark script

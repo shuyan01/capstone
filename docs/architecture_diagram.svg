@@ -108,8 +108,8 @@
   <text x="76" y="389" class="label">① retrieve_candidates</text>
   <text x="76" y="408" class="small">LLM query expansion</text>
   <text x="76" y="426" class="small">(gpt-4o-mini Direction A)</text>
-  <text x="76" y="444" class="small">ChromaDB + BM25 hybrid</text>
-  <text x="76" y="462" class="small">RRF score fusion (k=60)</text>
+  <text x="76" y="444" class="small">ChromaDB + BM25 → RRF</text>
+  <text x="76" y="462" class="small">Cross-Encoder reranking</text>
   <text x="76" y="480" class="small">Returns top-k candidates</text>
 
   <!-- N2 parse -->
