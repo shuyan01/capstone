@@ -1,0 +1,105 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#ede7f6', 'primaryTextColor': '#22180f', 'primaryBorderColor': '#4527a0', 'lineColor': '#7a6752', 'secondaryColor': '#f1e6d4', 'tertiaryColor': '#fff8e1', 'fontSize': '14px'}}}%%
+
+flowchart TD
+
+%% ============================================================
+%% A · Data Ingestion  (offline / one-time)
+%% ============================================================
+subgraph A["A · Data Ingestion (offline / one-time)"]
+  direction LR
+  A1["📄 Resume Sources\nResume.csv\nPDFs (24 categories)"]
+  A2["🔧 Parser & Cleaner\ningestion/parser.py\nPDF extraction (PyMuPDF)\nCSV row parsing\nHTML/URL removal"]
+  A3["✂️ Chunker\ningestion/chunker.py\n500-char chunks, 50 overlap\nSection-aware splitting\n→ chunks_cache.pkl"]
+  A1 --> A2 --> A3
+end
+
+%% ============================================================
+%% B · Embedding & Indexing
+%% ============================================================
+subgraph B["B · Embedding & Indexing"]
+  direction LR
+  B1["🧠 Embedder\ningestion/embedder.py\ntext-embedding-3-small\n1536-dim vectors\n→ ChromaDB (cosine, SQLite)"]
+  B2["🔑 BM25 Index\nretrieval/keyword_search.py\nBM25Okapi algorithm\nBuilt on first use\n→ bm25_index.pkl"]
+  B3["📝 Resume Summarizer\ningestion/summarizer.py\nGPT-4o-mini structured digest\nSKILLS/EXP/EDU/PROJECTS/CERTS\n→ resume_summaries_cache.pkl\nLLM called once per resume"]
+end
+A3 --> B1
+A3 --> B2
+A3 --> B3
+
+%% ============================================================
+%% C · Hybrid Retrieval  (per query)
+%% ============================================================
+subgraph C["C · Hybrid Retrieval (per query)"]
+  direction LR
+  C0["🔍 LLM Query Expansion\ngpt-4o-mini\nExpands query with\nrelated keywords"]
+  C1["📊 ChromaDB\nSemantic Search\nweight = 0.6"]
+  C2["📊 BM25\nKeyword Search\nweight = 0.4"]
+  C3["🔀 RRF Fusion\nReciprocal Rank Fusion\nk = 60\nDeduplicate by resume_id"]
+  C0 --> C1
+  C0 --> C2
+  C1 --> C3
+  C2 --> C3
+end
+
+%% ============================================================
+%% D · LangGraph 6-Node Pipeline
+%% ============================================================
+subgraph D["D · LangGraph Evaluation Pipeline (6 nodes)"]
+  direction LR
+  D1["① retrieve_candidates\nHybrid search\n(calls Lane C)"]
+  D2["② parse_candidates\nResume Parsing Agent\nHeuristic · zero LLM cost\nSection detection (8 types)\nbias_flags attached"]
+  D3["③ enrich_candidates\nAssemble full resume text\nAll chunks via closure\nUp to 3000 chars/candidate"]
+  D4["④ summarize_candidates\nGPT-4o-mini per resume\nStructured digest\nDisk cache R/W"]
+  D5["⑤ evaluate_candidates\n4 specialist agents\n(see Lane E)"]
+  D6["⑥ aggregate_scores\nDynamic weight profile\nskill 0.40 / exp 0.25\ntech 0.20 / culture 0.15\n+ NL explanation"]
+  D1 --> D2 --> D3 --> D4 --> D5 --> D6
+end
+C3 --> D1
+
+%% ============================================================
+%% E · 5 Specialist Agents
+%% ============================================================
+subgraph E["E · 5 Specialist Agents (Nodes ② & ⑤)"]
+  direction LR
+  E1["🤖 Resume Parsing\nHeuristic · zero LLM\nSection detection\n+ bias flags\n(runs at Node ②)"]
+  E2["🤖 Skill Matching\ngpt-4o-mini\nSkill coverage\nmatched/missing/partial"]
+  E3["🤖 Experience\ngpt-4o-mini\nYears & seniority\nCareer progression"]
+  E4["🤖 Technical Depth\ngpt-4o-mini\nProject complexity\nTech stack extraction"]
+  E5["🤖 Culture Fit\ngpt-4o ← stronger model\nSoft skills assessment\nLLM-as-judge role"]
+end
+E2 & E3 & E4 & E5 --> D5
+
+%% ============================================================
+%% F · Guardrails
+%% ============================================================
+subgraph F["F · Guardrails"]
+  direction LR
+  F1["🛡️ Input Validator\nguardrails/input_validator.py\nQuery length (20-2000 chars)\nRelevance check\nBlocked patterns\nBias language → HTTP 400"]
+  F2["🛡️ Resume Bias Validator\nguardrails/resume_validator.py\nDemographic marker detection\nAge/gender/nationality/religion\nAwareness flag only\nDoes NOT block candidates"]
+end
+F1 -.->|"validates before"| D1
+F2 -.->|"flags during"| D2
+
+%% ============================================================
+%% G · API & Frontend
+%% ============================================================
+subgraph G["G · API & Frontend"]
+  direction LR
+  G1["⚡ FastAPI Backend :8000\napi/main.py + routes.py\nPOST /match\nGET /categories\nGET /resume/{id}\nPOST /feedback\nGET /schedule\nGET /handoffs"]
+  G2["⚛️ React Frontend :3000\nVite + React Router v6\nSearchPage\nCandidatePage\nAnalyticsPage\nRecruiterPage\nGuardrail UI (amber block)"]
+  G1 --> G2
+end
+D6 --> G1
+
+%% ============================================================
+%% H · Feedback & Observability
+%% ============================================================
+subgraph H["H · Feedback Loop & Observability"]
+  direction LR
+  H1["📊 Recruiter Feedback\nHelpful/not helpful ratings\nInterview scheduling\nHandoff notes\nSQLite analytics store"]
+  H2["🔭 LangSmith Tracing\nAll pipeline nodes traced\nToken count & latency\nLANGCHAIN_TRACING_V2=true\nProject: ai-resume-matching"]
+  H3["🧪 DeepEval Tests\nAnswerRelevancyMetric\nGEval (LLM-as-judge)\nRUN_LLM_JUDGE=1 flag"]
+  H4["⚙️ Config\ngating_thresholds.json\n5 weight profiles\ntechnical/analytics\nmanagement/biz_dev/general"]
+end
+G1 --> H1
+D6 -.->|"traces"| H2

@@ -1,0 +1,297 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1180" viewBox="0 0 1600 1180">
+  <style>
+    .bg       { fill: #f7f3ea; }
+    .title    { font: 700 28px Georgia, serif; fill: #2f2419; }
+    .subtitle { font: 400 13px Arial, sans-serif; fill: #6d5a46; }
+    .lane     { fill: #fbf8f2; stroke: #dbcdb9; stroke-width: 2; rx: 22; }
+    .box      { fill: #fffdf8; stroke: #c8b79d; stroke-width: 2; rx: 14; }
+    .accent   { fill: #f1e6d4; stroke: #9a6a30; stroke-width: 2; rx: 14; }
+    .api      { fill: #ede6f7; stroke: #6555a1; stroke-width: 2; rx: 14; }
+    .analytics{ fill: #e7f2ea; stroke: #4d8a60; stroke-width: 2; rx: 14; }
+    .guardrail{ fill: #fff8e1; stroke: #f9a825; stroke-width: 2; rx: 14; }
+    .observe  { fill: #efebe9; stroke: #4e342e; stroke-width: 2; rx: 14; }
+    .pipeline { fill: #ede7f6; stroke: #4527a0; stroke-width: 2; rx: 14; }
+    .text     { font: 700 16px Arial, sans-serif; fill: #22180f; }
+    .small    { font: 400 12px Arial, sans-serif; fill: #4b3d30; }
+    .tiny     { font: 400 11px Arial, sans-serif; fill: #6d5a46; }
+    .label    { font: 600 11px Arial, sans-serif; fill: #1a237e; }
+    .arrow    { stroke: #7a6752; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead); }
+    .dashed   { stroke-dasharray: 7 6; }
+    .obs-arrow{ stroke: #4e342e; stroke-width: 1.5; fill: none; marker-end: url(#obsarrow); stroke-dasharray: 5 5; }
+  </style>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7a6752"/>
+    </marker>
+    <marker id="obsarrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#4e342e"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="1180" class="bg"/>
+
+  <!-- Title -->
+  <text x="52" y="48" class="title">AI Resume Matching System — Architecture</text>
+  <text x="52" y="70" class="subtitle">LangGraph 6-node pipeline · Hybrid retrieval (ChromaDB + BM25/RRF) · 5-agent evaluation · Guardrails · LangSmith observability</text>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LANE A — Ingestion & Indexing (offline / one-time)
+  ════════════════════════════════════════════════════════════ -->
+  <rect x="36" y="90" width="1528" height="208" class="lane"/>
+  <text x="56" y="116" class="text">A · Ingestion &amp; Indexing  (offline / one-time)</text>
+
+  <!-- Resume Sources -->
+  <rect x="56" y="130" width="190" height="130" class="box"/>
+  <text x="76" y="157" class="text">Resume Sources</text>
+  <text x="76" y="178" class="small">Resume.csv dataset</text>
+  <text x="76" y="196" class="small">PDF files (24 categories)</text>
+  <text x="76" y="214" class="small">Category labels</text>
+
+  <!-- Parser -->
+  <rect x="274" y="130" width="200" height="130" class="box"/>
+  <text x="294" y="157" class="text">Parser &amp; Cleaner</text>
+  <text x="294" y="178" class="small">PDF text extraction</text>
+  <text x="294" y="196" class="small">CSV row parsing</text>
+  <text x="294" y="214" class="small">Unified resume schema</text>
+
+  <!-- Chunker -->
+  <rect x="502" y="130" width="210" height="130" class="box"/>
+  <text x="522" y="157" class="text">Chunker</text>
+  <text x="522" y="178" class="small">Overlapping text chunks</text>
+  <text x="522" y="196" class="small">Chunk metadata attached</text>
+  <text x="522" y="214" class="small">chunks_cache.pkl (36 MB)</text>
+
+  <!-- Embedder -->
+  <rect x="740" y="110" width="240" height="168" class="accent"/>
+  <text x="760" y="137" class="text">Embedder</text>
+  <text x="760" y="158" class="small">text-embedding-3-small</text>
+  <text x="760" y="176" class="small">1 536-dim vectors</text>
+  <text x="760" y="200" class="label">↓ writes to</text>
+  <text x="760" y="218" class="small">ChromaDB vector store</text>
+  <text x="760" y="238" class="small">(cosine similarity, SQLite)</text>
+  <text x="760" y="258" class="small">BM25 built separately on first use</text>
+
+  <!-- GPT-4o-mini Summarizer -->
+  <rect x="1018" y="110" width="264" height="168" class="accent"/>
+  <text x="1038" y="137" class="text">Resume Summarizer</text>
+  <text x="1038" y="158" class="small">GPT-4o-mini structured digest</text>
+  <text x="1038" y="176" class="small">Sections: SKILLS / EXP / EDU /</text>
+  <text x="1038" y="194" class="small">PROJECTS / CERTS preserved</text>
+  <text x="1038" y="216" class="label">Disk cache (summaries.pkl)</text>
+  <text x="1038" y="234" class="small">LLM called once per resume</text>
+  <text x="1038" y="252" class="small">Zero cost on repeat queries</text>
+
+  <!-- Storage badges -->
+  <rect x="1320" y="130" width="220" height="130" class="box"/>
+  <text x="1340" y="157" class="text">Storage</text>
+  <text x="1340" y="178" class="small">ChromaDB (embeddings)</text>
+  <text x="1340" y="196" class="small">chunks_cache.pkl</text>
+  <text x="1340" y="214" class="small">resume_summaries_cache.pkl</text>
+
+  <!-- Arrows row A -->
+  <path d="M246 195 L274 195" class="arrow"/>
+  <path d="M474 195 L502 195" class="arrow"/>
+  <path d="M712 195 L740 195" class="arrow"/>
+  <path d="M980 195 L1018 195" class="arrow"/>
+  <path d="M1282 195 L1320 195" class="arrow"/>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LANE B — LangGraph Pipeline (6 nodes)
+  ════════════════════════════════════════════════════════════ -->
+  <rect x="36" y="320" width="1528" height="268" class="lane"/>
+  <text x="56" y="346" class="text">B · LangGraph Evaluation Pipeline  (6 nodes · per query)</text>
+
+  <!-- Node boxes -->
+  <!-- N1 retrieve -->
+  <rect x="56" y="364" width="190" height="186" class="pipeline"/>
+  <text x="76" y="389" class="label">① retrieve_candidates</text>
+  <text x="76" y="408" class="small">LLM query expansion</text>
+  <text x="76" y="426" class="small">(gpt-4o-mini Direction A)</text>
+  <text x="76" y="444" class="small">ChromaDB + BM25 hybrid</text>
+  <text x="76" y="462" class="small">RRF score fusion (k=60)</text>
+  <text x="76" y="480" class="small">Returns top-k candidates</text>
+
+  <!-- N2 parse -->
+  <rect x="270" y="364" width="196" height="186" class="pipeline"/>
+  <text x="290" y="389" class="label">② parse_candidates</text>
+  <text x="290" y="408" class="small">Heuristic · zero LLM cost</text>
+  <text x="290" y="426" class="small">Section detection (8 types)</text>
+  <text x="290" y="444" class="small">Structural richness score</text>
+  <text x="290" y="462" class="small">Word count</text>
+  <text x="290" y="480" class="small">→ bias_flags attached</text>
+
+  <!-- N3 enrich -->
+  <rect x="490" y="364" width="196" height="186" class="pipeline"/>
+  <text x="510" y="389" class="label">③ enrich_candidates</text>
+  <text x="510" y="408" class="small">Assemble full resume text</text>
+  <text x="510" y="426" class="small">All chunks per resume_id</text>
+  <text x="510" y="444" class="small">From chunks closure (not pkl)</text>
+  <text x="510" y="462" class="small">Up to 3 000 chars per</text>
+  <text x="510" y="480" class="small">candidate for agents</text>
+
+  <!-- N4 summarize -->
+  <rect x="710" y="364" width="196" height="186" class="pipeline"/>
+  <text x="730" y="389" class="label">④ summarize_candidates</text>
+  <text x="730" y="408" class="small">GPT-4o-mini per resume</text>
+  <text x="730" y="426" class="small">Structured digest output</text>
+  <text x="730" y="444" class="small">Cache R/W summaries.pkl</text>
+  <text x="730" y="462" class="small">Preserves ALL key info</text>
+  <text x="730" y="480" class="small">vs. naive truncation</text>
+
+  <!-- N5 evaluate -->
+  <rect x="930" y="364" width="196" height="186" class="pipeline"/>
+  <text x="950" y="389" class="label">⑤ evaluate_candidates</text>
+  <text x="950" y="408" class="small">4 specialist agents run</text>
+  <text x="950" y="426" class="small">per candidate (see Lane C)</text>
+  <text x="950" y="444" class="small">Skill / Exp / Tech scores</text>
+  <text x="950" y="462" class="small">Culture score</text>
+  <text x="950" y="480" class="small">0–1 float per dimension</text>
+
+  <!-- N6 aggregate -->
+  <rect x="1150" y="364" width="196" height="186" class="pipeline"/>
+  <text x="1170" y="389" class="label">⑥ aggregate_scores</text>
+  <text x="1170" y="408" class="small">Dynamic weight profile</text>
+  <text x="1170" y="426" class="small">Default: skill 0.40 /</text>
+  <text x="1170" y="444" class="small">exp 0.25 / tech 0.20 /</text>
+  <text x="1170" y="462" class="small">culture 0.15</text>
+  <text x="1170" y="480" class="small">+ NL explanation</text>
+
+  <!-- Arrows pipeline -->
+  <path d="M246 457 L270 457" class="arrow"/>
+  <path d="M466 457 L490 457" class="arrow"/>
+  <path d="M686 457 L710 457" class="arrow"/>
+  <path d="M906 457 L930 457" class="arrow"/>
+  <path d="M1126 457 L1150 457" class="arrow"/>
+
+  <!-- Retrieval ↔ ChromaDB (back to lane A) -->
+  <path d="M151 364 L151 298 L860 298 L860 278" class="arrow dashed"/>
+  <!-- Enrich ↔ chunks cache -->
+  <path d="M588 364 L588 298 L607 298 L607 260" class="arrow dashed"/>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LANE C — Specialist Agents
+  ════════════════════════════════════════════════════════════ -->
+  <rect x="36" y="610" width="1528" height="160" class="lane"/>
+  <text x="56" y="636" class="text">C · Specialist Agents  (Nodes ② &amp; ⑤)</text>
+
+  <rect x="56" y="650" width="330" height="102" class="box"/>
+  <text x="76" y="674" class="text">Resume Parsing Agent</text>
+  <text x="76" y="694" class="small">Heuristic · zero LLM cost</text>
+  <text x="76" y="712" class="small">Section detection + bias flags</text>
+  <text x="76" y="730" class="small">(runs at Node ②)</text>
+
+  <rect x="416" y="650" width="260" height="102" class="box"/>
+  <text x="436" y="674" class="text">Skill Matching</text>
+  <text x="436" y="694" class="small">gpt-4o-mini</text>
+  <text x="436" y="712" class="small">Technical skill coverage</text>
+  <text x="436" y="730" class="small">Structured extraction task</text>
+
+  <rect x="706" y="650" width="260" height="102" class="box"/>
+  <text x="726" y="674" class="text">Experience Agent</text>
+  <text x="726" y="694" class="small">gpt-4o-mini</text>
+  <text x="726" y="712" class="small">Seniority &amp; years signals</text>
+  <text x="726" y="730" class="small">Structured extraction task</text>
+
+  <rect x="996" y="650" width="260" height="102" class="box"/>
+  <text x="1016" y="674" class="text">Technical Depth Agent</text>
+  <text x="1016" y="694" class="small">gpt-4o-mini</text>
+  <text x="1016" y="712" class="small">Project complexity</text>
+  <text x="1016" y="730" class="small">Structured extraction task</text>
+
+  <rect x="1286" y="650" width="250" height="102" class="accent"/>
+  <text x="1306" y="674" class="text">Culture Fit Agent</text>
+  <text x="1306" y="694" class="small">gpt-4o  ← stronger model</text>
+  <text x="1306" y="712" class="small">Soft skills, subjective</text>
+  <text x="1306" y="730" class="small">Requires reasoning ability</text>
+
+  <!-- Lane C → N5 -->
+  <path d="M1028 610 L1028 550" class="arrow"/>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LANE D — Guardrails
+  ════════════════════════════════════════════════════════════ -->
+  <rect x="36" y="792" width="740" height="140" class="lane"/>
+  <text x="56" y="816" class="text">D · Guardrails</text>
+
+  <rect x="56" y="832" width="320" height="80" class="guardrail"/>
+  <text x="76" y="857" class="text">Input Validator</text>
+  <text x="76" y="876" class="small">Query length · relevance · blocked patterns</text>
+  <text x="76" y="894" class="small">Bias language → HTTP 400 (not a crash)</text>
+
+  <rect x="412" y="832" width="320" height="80" class="guardrail"/>
+  <text x="432" y="857" class="text">Resume Bias Validator</text>
+  <text x="432" y="876" class="small">Demographic marker detection in resume text</text>
+  <text x="432" y="894" class="small">Awareness flag only — does NOT block candidates</text>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LANE E — API & Frontend
+  ════════════════════════════════════════════════════════════ -->
+  <rect x="800" y="792" width="764" height="140" class="lane"/>
+  <text x="820" y="816" class="text">E · API &amp; Frontend</text>
+
+  <rect x="820" y="832" width="350" height="80" class="api"/>
+  <text x="840" y="857" class="text">FastAPI Backend  · :8000</text>
+  <text x="840" y="876" class="small">POST /match · GET /categories · GET /resume/{id}</text>
+  <text x="840" y="894" class="small">POST /feedback · GET /schedule · GET /handoffs</text>
+
+  <rect x="1202" y="832" width="330" height="80" class="api"/>
+  <text x="1222" y="857" class="text">React Frontend  · :3000</text>
+  <text x="1222" y="876" class="small">Search · CandidatePage · Analytics · Recruiter</text>
+  <text x="1222" y="894" class="small">Guardrail UI (amber block) · Bias flag warning</text>
+
+  <!-- Input Validator → Pipeline -->
+  <path d="M216 792 L216 590 L56 590 L56 550" class="arrow dashed"/>
+  <!-- Resume Bias → parse node -->
+  <path d="M572 792 L572 590 L368 590 L368 550" class="arrow dashed"/>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LANE F — Feedback & Observability
+  ════════════════════════════════════════════════════════════ -->
+  <rect x="36" y="956" width="1528" height="196" class="lane"/>
+  <text x="56" y="980" class="text">F · Feedback Loop &amp; Observability</text>
+
+  <rect x="56" y="998" width="310" height="126" class="analytics"/>
+  <text x="76" y="1022" class="text">Recruiter Feedback Loop</text>
+  <text x="76" y="1044" class="small">Helpful / not helpful ratings</text>
+  <text x="76" y="1062" class="small">Interview schedule records</text>
+  <text x="76" y="1080" class="small">Hiring-manager handoff notes</text>
+  <text x="76" y="1098" class="small">SQLite analytics store</text>
+
+  <rect x="402" y="998" width="310" height="126" class="analytics"/>
+  <text x="422" y="1022" class="text">Analytics Dashboard</text>
+  <text x="422" y="1044" class="small">Feedback trend stats</text>
+  <text x="422" y="1062" class="small">Interview pipeline view</text>
+  <text x="422" y="1080" class="small">Candidate timeline + search</text>
+  <text x="422" y="1098" class="small">Served at /analytics endpoint</text>
+
+  <rect x="748" y="998" width="310" height="126" class="observe"/>
+  <text x="768" y="1022" class="text">LangSmith Tracing</text>
+  <text x="768" y="1044" class="small">Every pipeline node traced</text>
+  <text x="768" y="1062" class="small">Per-node token count &amp; latency</text>
+  <text x="768" y="1080" class="small">Full run history dashboard</text>
+  <text x="768" y="1098" class="small">LANGCHAIN_TRACING_V2=true</text>
+
+  <rect x="1094" y="998" width="310" height="126" class="observe"/>
+  <text x="1114" y="1022" class="text">DeepEval Test Suite</text>
+  <text x="1114" y="1044" class="small">AnswerRelevancyMetric</text>
+  <text x="1114" y="1062" class="small">GEval (LLM-as-judge)</text>
+  <text x="1114" y="1080" class="small">Results → JSON per run</text>
+  <text x="1114" y="1098" class="small">RUN_LLM_JUDGE=1 flag</text>
+
+  <rect x="1440" y="998" width="100" height="126" class="box"/>
+  <text x="1452" y="1040" class="small">Config</text>
+  <text x="1452" y="1060" class="small">gating_</text>
+  <text x="1452" y="1078" class="small">thresholds</text>
+  <text x="1452" y="1096" class="small">.json</text>
+
+  <!-- Pipeline → LangSmith -->
+  <path d="M1346 588 L1346 940 L903 940 L903 998" class="obs-arrow"/>
+  <!-- API → Feedback -->
+  <path d="M995 932 L995 956 L211 956 L211 998" class="obs-arrow"/>
+
+  <!-- API → Frontend -->
+  <path d="M1170 872 L1202 872" class="arrow"/>
+  <!-- Input Validator → API -->
+  <path d="M376 872 L820 872" class="arrow"/>
+</svg>
