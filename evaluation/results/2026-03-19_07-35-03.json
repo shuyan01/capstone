@@ -1,0 +1,414 @@
+{
+  "_readme": "AI Resume Matching System — DeepEval Evaluation Report. Fields: run_at = ISO timestamp of when this run started; llm_judge = whether LLM-graded DeepEval tests (AnswerRelevancy + GEval) were executed (requires RUN_LLM_JUDGE=1); passed/failed/total = suite-level counts (one suite = one test class); suites[] = per-suite results. Each suite has: description (what it tests), pass_criteria (threshold to pass), how_to_read (field-by-field guide to the details), status (passed/failed/error), error (assertion message if failed), details (per-query breakdown with scores).",
+  "run_at": "2026-03-19T07:35:03.257814",
+  "llm_judge": true,
+  "passed": 10,
+  "failed": 0,
+  "total": 10,
+  "suites": [
+    {
+      "suite": "Skill Coverage",
+      "description": "Verifies that the top-ranked candidate actually possesses the skills mentioned in the job query.",
+      "pass_criteria": "At least 60% of test queries must return a candidate with ≥1 matched skill.",
+      "how_to_read": "Check 'matched_skills' (list of skills found in the resume) and 'skill_score' (0.0–1.0, fraction of required skills matched). 1.0 = all required skills found.",
+      "status": "passed",
+      "error": null,
+      "details": [
+        {
+          "query": "Java full stack developer with Spring Boot and MySQL",
+          "status": "pass",
+          "matched_skills": [
+            "Java",
+            "Spring Boot",
+            "MySQL"
+          ],
+          "skill_score": 1.0
+        },
+        {
+          "query": "Chef with culinary skills and kitchen management experience",
+          "status": "pass",
+          "matched_skills": [
+            "culinary skills",
+            "kitchen management"
+          ],
+          "skill_score": 1.0
+        },
+        {
+          "query": "Data analyst with SQL and Excel reporting skills",
+          "status": "pass",
+          "matched_skills": [
+            "SQL",
+            "Excel"
+          ],
+          "skill_score": 1.0
+        }
+      ]
+    },
+    {
+      "suite": "Experience Fit",
+      "description": "Verifies that the pipeline surfaces candidates whose years of experience meet the query's implied seniority level.",
+      "pass_criteria": "At least 60% of test queries must return at least one candidate with years >= the expected minimum.",
+      "how_to_read": "'years_detected' lists total work-years for each of the top-3 candidates. 'min_years_required' is the threshold the query implies.",
+      "status": "passed",
+      "error": null,
+      "details": [
+        {
+          "query": "Senior Java developer with 5+ years experience",
+          "status": "pass",
+          "min_years_required": 3,
+          "years_detected": [
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "query": "Entry level data analyst with SQL skills",
+          "status": "pass",
+          "min_years_required": 0,
+          "years_detected": [
+            5,
+            5,
+            5
+          ]
+        },
+        {
+          "query": "Experienced chef with 10 years in fine dining",
+          "status": "pass",
+          "min_years_required": 3,
+          "years_detected": [
+            25,
+            25,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "suite": "Ranking Quality",
+      "description": "Verifies that candidates are strictly sorted by composite score (best match first).",
+      "pass_criteria": "100% of test queries must return results in descending score order.",
+      "how_to_read": "'scores' is the ranked list of composite scores (0.0–1.0). 'is_sorted' must be true for the test to pass.",
+      "status": "passed",
+      "error": null,
+      "details": [
+        {
+          "query": "Java developer with Spring Boot and MySQL experience",
+          "status": "pass",
+          "scores": [
+            0.846,
+            0.846,
+            0.423,
+            0.423,
+            0.423
+          ],
+          "is_sorted": true
+        },
+        {
+          "query": "IT consultant with ERP and project management",
+          "status": "pass",
+          "scores": [
+            0.746,
+            0.746,
+            0.63,
+            0.35,
+            0.288
+          ],
+          "is_sorted": true
+        },
+        {
+          "query": "Chef with international cuisine and kitchen management",
+          "status": "pass",
+          "scores": [
+            0.726,
+            0.726,
+            0.663,
+            0.446,
+            0.446
+          ],
+          "is_sorted": true
+        }
+      ]
+    },
+    {
+      "suite": "Diversity",
+      "description": "Verifies that two very different job queries return mostly different candidates — the retrieval is category-aware, not generic.",
+      "pass_criteria": "Overlap between the two result sets must be ≤20%.",
+      "how_to_read": "'overlap_pct' is the fraction of candidates shared between the two queries. 0.0 = perfect diversity. 'overlap' lists any shared resume IDs.",
+      "status": "passed",
+      "error": null,
+      "details": {
+        "query_a": "Java full stack developer with Spring Boot",
+        "query_b": "Chef with culinary arts and kitchen experience",
+        "ids_a": [
+          "resume_csv_0297",
+          "resume_pdf_1224"
+        ],
+        "ids_b": [
+          "resume_csv_1373",
+          "resume_csv_1375",
+          "resume_csv_1423",
+          "resume_pdf_0577",
+          "resume_pdf_0603"
+        ],
+        "overlap": [],
+        "overlap_pct": 0.0,
+        "status": "pass"
+      }
+    },
+    {
+      "suite": "Guardrails (invalid)",
+      "description": "Verifies that the input guardrail correctly rejects queries that are empty, too vague, off-topic, or contain biased/harmful language.",
+      "pass_criteria": "All 5 invalid queries must be rejected.",
+      "how_to_read": "'rejected' should be true for every entry. 'reason' explains why the guardrail blocked it.",
+      "status": "passed",
+      "error": null,
+      "details": [
+        {
+          "query": "(empty)",
+          "status": "pass",
+          "rejected": true,
+          "reason": ""
+        },
+        {
+          "query": "Python",
+          "status": "pass",
+          "rejected": true,
+          "reason": ""
+        },
+        {
+          "query": "What is the weather today?",
+          "status": "pass",
+          "rejected": true,
+          "reason": ""
+        },
+        {
+          "query": "We need someone to hack into our systems",
+          "status": "pass",
+          "rejected": true,
+          "reason": ""
+        },
+        {
+          "query": "Looking for a young female developer only",
+          "status": "pass",
+          "rejected": true,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "suite": "Guardrails (valid)",
+      "description": "Verifies that the input guardrail does NOT block legitimate job queries.",
+      "pass_criteria": "All 3 valid queries must pass through.",
+      "how_to_read": "'accepted' should be true for every entry. If false, the guardrail is over-blocking.",
+      "status": "passed",
+      "error": null,
+      "details": [
+        {
+          "query": "We are looking for a Java developer with Spring Boot experience.",
+          "status": "pass",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "query": "Senior data analyst with SQL and Python skills needed.",
+          "status": "pass",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "query": "Chef with 5 years of fine dining experience.",
+          "status": "pass",
+          "accepted": true,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "suite": "Culture Match",
+      "description": "Verifies that queries emphasising soft skills (communication, teamwork, leadership) surface candidates with a non-trivial culture-fit score.",
+      "pass_criteria": "At least 50% of test queries must yield a candidate with culture_score ≥0.3 or at least one detected soft skill.",
+      "how_to_read": "'culture_score' is the Culture Fit Agent's output (0.0–1.0). 'soft_skills' lists the skills GPT-4o identified in the resume.",
+      "status": "passed",
+      "error": null,
+      "details": [
+        {
+          "query": "Client-facing consultant with strong communication and teamwork skills",
+          "status": "pass",
+          "culture_score": 0.72,
+          "soft_skills": [
+            "leadership",
+            "communication",
+            "problem-solving"
+          ]
+        },
+        {
+          "query": "Engineering lead who mentors teams and collaborates across functions",
+          "status": "pass",
+          "culture_score": 0.72,
+          "soft_skills": [
+            "leadership",
+            "communication",
+            "problem-solving"
+          ]
+        }
+      ]
+    },
+    {
+      "suite": "Benchmark Runner",
+      "description": "Measures end-to-end pipeline wall-clock latency and throughput across 3 representative queries (IT / Chef / Finance). Each query runs the full 6-node LangGraph pipeline: vector+BM25 retrieval → cross-encoder reranking → 4 LLM agents → score aggregation.",
+      "pass_criteria": "Average query latency must be ≤300s (5 min). Threshold is intentionally generous to account for cold API starts; typical warm-cache runs are much faster.",
+      "how_to_read": "'avg_latency_s' is the key headline number. 'overall_throughput_c_per_s' = total candidates returned / total wall time. 'per_query' breaks down latency per domain so bottlenecks are identifiable.",
+      "status": "passed",
+      "error": null,
+      "details": {
+        "queries_run": 3,
+        "top_k": 5,
+        "avg_latency_s": 54.76,
+        "min_latency_s": 47.22,
+        "max_latency_s": 66.66,
+        "total_candidates": 15,
+        "overall_throughput_c_per_s": 0.0913,
+        "threshold_avg_latency_s": 300,
+        "status": "pass",
+        "per_query": [
+          {
+            "domain": "IT",
+            "query": "Java full stack developer with Spring Boot and MySQL",
+            "latency_s": 47.22,
+            "candidates_returned": 5,
+            "throughput_c_per_s": 0.1059
+          },
+          {
+            "domain": "Chef",
+            "query": "Chef with international cuisine and kitchen management",
+            "latency_s": 50.42,
+            "candidates_returned": 5,
+            "throughput_c_per_s": 0.0992
+          },
+          {
+            "domain": "Finance",
+            "query": "Financial analyst with Excel modeling and budgeting experience",
+            "latency_s": 66.66,
+            "candidates_returned": 5,
+            "throughput_c_per_s": 0.075
+          }
+        ]
+      }
+    },
+    {
+      "suite": "Answer Relevancy (DeepEval)",
+      "description": "LLM-as-Judge (DeepEval AnswerRelevancyMetric, GPT-4o): evaluates whether each candidate explanation is topically relevant to its job query. Four diverse domains are tested (IT / Chef / Finance / HR) to demonstrate cross-domain reliability.",
+      "pass_criteria": "Relevancy score must be ≥0.5 (scale 0.0–1.0) for every query.",
+      "how_to_read": "'score' is GPT-4o's relevancy rating (1.0 = perfectly on-topic). 'reason' is the LLM's natural-language justification — cite this to show GPT-4o-mini outputs are high-quality. 'explanation' is the verbatim pipeline output that was judged.",
+      "status": "passed",
+      "error": null,
+      "details": [
+        {
+          "query": "Java full stack developer with Spring Boot and MySQL",
+          "candidate": "resume_csv_0297",
+          "metric": "AnswerRelevancy",
+          "score": 0.875,
+          "threshold": 0.5,
+          "status": "pass",
+          "reason": "The score is 0.88 because the answer included information about soft skills, which are not directly relevant to the technical requirements of a Java full stack developer with Spring Boot and MySQL. However, the main content still addressed the core technical stack requested, keeping the score relatively high.",
+          "explanation": "Matched skills: Java, Spring Boot, MySQL. 5 years of experience, mid-level. Relevant roles: Java Full Stack Developer, Test Automation Engineer. Tech stack: Java, Spring Boot, MySQL. Notable: Developed a Test Automation Framework for WebTix. Soft skills: communication, problem-solving, teamwork. Str"
+        },
+        {
+          "query": "Chef with culinary arts and kitchen management experience",
+          "candidate": "resume_csv_1423",
+          "metric": "AnswerRelevancy",
+          "score": 0.8333333333333334,
+          "threshold": 0.5,
+          "status": "pass",
+          "reason": "The score is 0.83 because while most of the answer focused on culinary arts and kitchen management, there was an irrelevant mention of technical depth score, which does not pertain to the input. This unrelated detail prevented a higher score, but the main content was still largely relevant.",
+          "explanation": "Matched skills: culinary arts, kitchen management. 11 years of experience, senior-level. Relevant roles: Executive Chef, Director of Culinary Arts. Notable: Doubled sales within one year through effective marketing. Soft skills: leadership, communication, problem-solving. Moderate match worth consid"
+        },
+        {
+          "query": "Financial analyst with Excel modeling and budgeting experience",
+          "candidate": "resume_pdf_1638",
+          "metric": "AnswerRelevancy",
+          "score": 1.0,
+          "threshold": 0.5,
+          "status": "pass",
+          "reason": "Great job! The answer is fully relevant and directly addresses the input with no irrelevant statements.",
+          "explanation": "Matched skills: Financial Analysis, Excel, Budgeting. Missing: Modeling. 15 years of experience, senior-level. Relevant roles: Corporate Director of Finance, Senior Manager of Finance. Tech stack: MS Excel. Notable: Managed yearly budget process. Soft skills: leadership, communication, problem-solvi"
+        },
+        {
+          "query": "HR manager with talent acquisition and employee relations experience",
+          "candidate": "resume_csv_0105",
+          "metric": "AnswerRelevancy",
+          "score": 0.7142857142857143,
+          "threshold": 0.5,
+          "status": "pass",
+          "reason": "The score is 0.71 because while the answer addresses some relevant aspects, it includes subjective match assessments and technical depth that are not directly related to HR management, talent acquisition, or employee relations, preventing a higher score.",
+          "explanation": "Matched skills: HR management, talent acquisition, employee relations. 14 years of experience, senior-level. Relevant roles: HR Manager, Business Partner. Soft skills: leadership, communication, problem-solving. Moderate match worth considering. Screening note: technical depth below threshold (0.00 "
+        }
+      ]
+    },
+    {
+      "suite": "LLM Judge / GEval (DeepEval)",
+      "description": "LLM-as-Judge (DeepEval GEval): GPT-4o (judge) scores the explanations that GPT-4o-mini (candidate model) produced, across 3 job domains (IT / Chef / Finance). Tests four criteria: relevance, skill/experience grounding, factual consistency with scores, professional tone.",
+      "pass_criteria": "All 3 domains must pass GEval ≥0.5.  Mean GEval score across domains is reported for statistical breadth.",
+      "how_to_read": "'avg_geval_score' is the cross-domain mean (higher = more consistent quality). 'judge_model' / 'candidate_model' clarifies the two-tier evaluation setup. 'per_query[].reason' contains the natural-language critique from GPT-4o for each domain.",
+      "status": "passed",
+      "error": null,
+      "details": {
+        "judge_model": "gpt-4o (DeepEval default)",
+        "candidate_model": "gpt-4o-mini",
+        "threshold": 0.5,
+        "domains_tested": [
+          "IT",
+          "Chef",
+          "Finance"
+        ],
+        "avg_geval_score": 0.882,
+        "all_passed": true,
+        "per_query": [
+          {
+            "query": "Java full stack developer with Spring Boot and MySQL experience",
+            "domain": "IT",
+            "candidate": "resume_csv_0297",
+            "composite_score": 0.846,
+            "metric": "GEval: Explanation Quality",
+            "judge_model": "gpt-4o (DeepEval default)",
+            "candidate_model": "gpt-4o-mini",
+            "score": 0.901590639159519,
+            "threshold": 0.5,
+            "status": "pass",
+            "reason": "The explanation directly addresses the job query by matching the candidate's skills (Java, Spring Boot, MySQL) and experience (5 years, mid-level) to the requirements. It references specific skills and relevant roles, and mentions a notable project (Test Automation Framework for WebTix), supporting the factual basis with candidate scores. The explanation is clear and maintains a professional tone. However, it could be slightly improved by more explicitly connecting the candidate's experience to the full stack aspect of the role.",
+            "explanation": "Matched skills: Java, Spring Boot, MySQL. 5 years of experience, mid-level. Relevant roles: Java Full Stack Developer, Test Automation Engineer. Tech stack: Java, Spring Boot, MySQL. Notable: Developed a Test Automation Framework for WebTix. Soft skills: communication, problem-solving, adaptability."
+          },
+          {
+            "query": "Chef with international cuisine and kitchen management",
+            "domain": "Chef",
+            "candidate": "resume_pdf_0609",
+            "composite_score": 0.446,
+            "metric": "GEval: Explanation Quality",
+            "judge_model": "gpt-4o (DeepEval default)",
+            "candidate_model": "gpt-4o-mini",
+            "score": 0.8843895098628499,
+            "threshold": 0.5,
+            "status": "pass",
+            "reason": "The explanation directly addresses the job query by identifying the required skills (international cuisine and kitchen management), explicitly noting that only kitchen management is matched and international cuisine is missing. It references specific experience (15 years, senior-level) and relevant roles, and mentions soft skills. The explanation is factually supported by the candidate scores (technical depth below threshold, missing 1 out of 2 required skills). The tone is clear and professional. The only minor shortcoming is that it could have briefly elaborated on the impact of the missing skill, but overall it aligns strongly with the evaluation steps.",
+            "explanation": "Matched skills: Kitchen Management. Missing: International Cuisine. 15 years of experience, senior-level. Relevant roles: Chef and Restaurant Manager, Chef and Sous Chef. Soft skills: leadership, communication, problem-solving. Partial match with some relevant signals. Screening note: technical dept"
+          },
+          {
+            "query": "Financial analyst with Excel modeling and budgeting experience",
+            "domain": "Finance",
+            "candidate": "resume_pdf_1638",
+            "composite_score": 0.746,
+            "metric": "GEval: Explanation Quality",
+            "judge_model": "gpt-4o (DeepEval default)",
+            "candidate_model": "gpt-4o-mini",
+            "score": 0.8607663176938024,
+            "threshold": 0.5,
+            "status": "pass",
+            "reason": "The explanation directly addresses the job query by matching the candidate's skills and experience to the requirements of a financial analyst with Excel modeling and budgeting experience. It references specific skills (Financial Analysis, Excel, Budgeting), relevant roles, years of experience, and soft skills. The mention of 'Missing: Modeling' shows attention to detail and factual support. The explanation is clear and professional, but it could be slightly improved by elaborating on the modeling gap.",
+            "explanation": "Matched skills: Financial Analysis, Excel, Budgeting. Missing: Modeling. 15 years of experience, senior-level. Relevant roles: Corporate Director of Finance, Senior Manager of Finance. Tech stack: MS Excel. Notable: Managed yearly budget process. Soft skills: leadership, communication, problem-solvi"
+          }
+        ]
+      }
+    }
+  ]
+}

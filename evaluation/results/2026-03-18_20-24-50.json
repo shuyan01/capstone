@@ -1,0 +1,54 @@
+{
+  "run_at": "2026-03-18T20:24:50.718916",
+  "llm_judge": true,
+  "passed": 9,
+  "failed": 0,
+  "total": 9,
+  "suites": [
+    {
+      "suite": "Skill Coverage",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "suite": "Experience Fit",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "suite": "Ranking Quality",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "suite": "Diversity",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "suite": "Guardrails (invalid)",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "suite": "Guardrails (valid)",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "suite": "Culture Match",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "suite": "Answer Relevancy (DeepEval)",
+      "status": "passed",
+      "error": null
+    },
+    {
+      "suite": "LLM Judge / GEval (DeepEval)",
+      "status": "passed",
+      "error": null
+    }
+  ]
+}
