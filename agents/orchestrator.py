@@ -58,12 +58,22 @@ from scoring.aggregator               import aggregate_candidate_scores
 
 load_dotenv()
 
-# ── LangSmith tracing (optional) ───────────────────────────────
-# Set LANGCHAIN_TRACING_V2=true + LANGCHAIN_API_KEY in .env to enable.
+# ── LangSmith tracing ───────────────────────────────
+# Supports both the legacy LANGCHAIN_TRACING_V2 env var and the newer
+# LANGSMITH_TRACING var so that either .env naming convention works.
 # LangGraph traces every node automatically: real token counts,
 # per-node latency, and full run history appear in the LangSmith dashboard.
-if os.getenv("LANGCHAIN_TRACING_V2", "false").lower() == "true":
-    _project = os.getenv("LANGCHAIN_PROJECT", "ai-resume-matching")
+_tracing_on = (
+    os.getenv("LANGCHAIN_TRACING_V2", "false").lower() == "true"
+    or os.getenv("LANGSMITH_TRACING", "false").lower() == "true"
+)
+if _tracing_on:
+    # langsmith SDK reads LANGSMITH_API_KEY or LANGCHAIN_API_KEY
+    if os.getenv("LANGSMITH_API_KEY") and not os.getenv("LANGCHAIN_API_KEY"):
+        os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGSMITH_API_KEY")
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    _project = os.getenv("LANGSMITH_PROJECT") or os.getenv("LANGCHAIN_PROJECT", "ai-resume-matching")
+    os.environ["LANGCHAIN_PROJECT"] = _project
     print(f"[LangSmith] Tracing enabled — project: '{_project}'")
 
 
